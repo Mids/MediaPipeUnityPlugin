@@ -63,6 +63,9 @@ Shader "Unlit/MediaPipe/Unmask Shader"
                 fixed4 maskCol = tex2D(_MaskTex, i.uv);
                 int idx = int(i.uv.y * _Height) * _Width + int(i.uv.x * _Width);
                 float mask = _MaskBuffer[idx];
+                if(mask < 0.5) {
+                    discard;
+                }
                 fixed4 col = lerp(maskCol, lerp(maskCol, mainCol, mask), step(_Threshold, mask));
 
                 // apply fog
