@@ -44,6 +44,17 @@ node {
   output_stream: "throttled_input_video"
 }
 
+node: {
+  calculator: "ImageTransformationCalculator"
+  input_stream: "IMAGE:throttled_input_video"
+  output_stream: "IMAGE:transformed_input_video"
+  node_options: {
+    [type.googleapis.com/mediapipe.ImageTransformationCalculatorOptions] {
+      flip_vertically: true
+    }
+  }
+}
+
 # Defines side packets for further use in the graph.
 node {
   calculator: "ConstantSidePacketCalculator"
@@ -60,7 +71,7 @@ node {
 # Subgraph that detects faces and corresponding landmarks.
 node {
   calculator: "FaceLandmarkFrontCpu"
-  input_stream: "IMAGE:throttled_input_video"
+  input_stream: "IMAGE:transformed_input_video"
   input_side_packet: "NUM_FACES:num_faces"
   input_side_packet: "WITH_ATTENTION:with_attention"
   output_stream: "LANDMARKS:multi_face_landmarks"
@@ -72,7 +83,7 @@ node {
 # Subgraph that renders face-landmark annotation onto the input image.
 node {
   calculator: "FaceRendererCpu"
-  input_stream: "IMAGE:throttled_input_video"
+  input_stream: "IMAGE:transformed_input_video"
   input_stream: "LANDMARKS:multi_face_landmarks"
   input_stream: "NORM_RECTS:face_rects_from_landmarks"
   input_stream: "DETECTIONS:face_detections"
